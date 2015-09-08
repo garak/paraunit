@@ -2,11 +2,8 @@
 
 namespace Paraunit\Tests\Functional;
 
-use Paraunit\Runner\Runner;
+use Paraunit\Runner\ParallelRunner;
 use Paraunit\Tests\Stub\ConsoleOutputStub;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
  * Class RunnerTest.
@@ -19,7 +16,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        require_once getcwd(). '/Container.php';
+        require_once getcwd() . '/Container.php';
 
         $this->container = getContainer();
     }
@@ -28,7 +25,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $outputInterface = new ConsoleOutputStub();
 
-        /** @var Runner $runner */
+        /** @var ParallelRunner $runner */
         $runner = $this->container->get('paraunit.runner.runner');
 
         $fileArray = array(

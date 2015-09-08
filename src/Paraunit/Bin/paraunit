@@ -21,7 +21,7 @@ require_once __DIR__ . '/../../../Container.php';
 
 /** @var \Paraunit\Filter\Filter $filter */
 $filter = $container->get('paraunit.filter.filter');
-/** @var \Paraunit\Runner\Runner $runner */
+/** @var \Paraunit\Runner\ParallelRunner $runner */
 $runner = $container->get('paraunit.runner.runner');
 
 $command = new ParallelCommand($filter, $runner);

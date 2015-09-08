@@ -3,7 +3,7 @@
 namespace Paraunit\Command;
 
 use Paraunit\Filter\Filter;
-use Paraunit\Runner\Runner;
+use Paraunit\Runner\ParallelRunner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,15 +17,15 @@ class ParallelCommand extends Command
     /** @var Filter */
     protected $filter;
 
-    /** @var Runner */
+    /** @var ParallelRunner */
     protected $runner;
 
     /**
      * @param Filter $filter
-     * @param Runner $runner
+     * @param ParallelRunner $runner
      * @param string $name
      */
-    public function __construct(Filter $filter, Runner $runner, $name = 'Paraunit')
+    public function __construct(Filter $filter, ParallelRunner $runner, $name = 'Paraunit')
     {
         parent::__construct($name);
 
@@ -62,6 +62,6 @@ class ParallelCommand extends Command
 
         $testArray = $this->filter->filterTestFiles($config, $testsuite);
 
-        return $this->runner->run($testArray, $output, $config, $input->getOption('debug'));
+        return $this->runner->run($testArray, $input, $output);
     }
 }

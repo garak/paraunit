@@ -2,6 +2,7 @@
 
 namespace Paraunit\Runner;
 
+use Paraunit\Lifecycle\EngineEvent;
 use Paraunit\Parser\ProcessOutputParser;
 use Paraunit\Printer\DebugPrinter;
 use Paraunit\Printer\FinalPrinter;
@@ -10,15 +11,15 @@ use Paraunit\Printer\SharkPrinter;
 use Paraunit\Process\ParaunitProcessAbstract;
 use Paraunit\Process\ParaunitProcessInterface;
 use Paraunit\Process\SymfonyProcessWrapper;
-use Paraunit\Lifecycle\EngineEvent;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class Runner.
+ * Class ParallelRunner.
  */
-class Runner
+class ParallelRunner extends AbstractRunner implements RunnerInterface
 {
     // I'm using Paraunit as a vendor package
     const PHPUNIT_RELPATH_FOR_VENDOR = '/../../../../../phpunit/phpunit/phpunit';
@@ -118,29 +119,30 @@ class Runner
     }
 
     /**
-     * @param $files
-     * @param OutputInterface $outputInterface
+     * @param array $files
+     * @param InputInterface $input
+     * @param OutputInterface $output
      *
      * @return int
      */
-    public function run($files, OutputInterface $outputInterface, $phpunitConfigFile, $debug = false)
+    public function run(array $files, InputInterface $input, OutputInterface $output)
     {
-        $this->phpunitConfigFile = $phpunitConfigFile;
+        $this->handleOptions($input);
 
         $this->eventDispatcher
-            ->dispatch(EngineEvent::BEFORE_START, EngineEvent::buildFromContext($files, $outputInterface));
+            ->dispatch(EngineEvent::BEFORE_START, EngineEvent::buildFromContext($files, $output));
 
         $start = new \Datetime('now');
         $this->createProcessStackFromFiles($files);
 
         while (!empty($this->processStack) || !empty($this->processRunning)) {
-            $this->runProcess($debug);
+            $this->runProcess();
 
             foreach ($this->processRunning as $process) {
                 if ($process->isTerminated()) {
                     $this->retryManager->setRetryStatus($process);
                     $this->processOutputParser->evaluateAndSetProcessResult($process);
-                    $this->processPrinter->printProcessResult($outputInterface, $process);
+                    $this->processPrinter->printProcessResult($output, $process);
 
                     // Completato o reset e stack
                     $this->markProcessCompleted($process);
@@ -152,9 +154,18 @@ class Runner
 
         $end = new \Datetime('now');
 
-        $this->finalPrinter->printFinalResults($outputInterface, $this->processCompleted, $start->diff($end));
+        $this->finalPrinter->printFinalResults($output, $this->processCompleted, $start->diff($end));
 
         return $this->getReturnCode();
+    }
+
+    /**
+     * @param InputInterface $input
+     */
+    private function handleOptions(InputInterface $input)
+    {
+        $this->extractPhpunitConfigFile($input);
+        $this->extractDebugOption($input);
     }
 
     /**
@@ -201,10 +212,7 @@ class Runner
         return new SymfonyProcessWrapper($command);
     }
 
-    /**
-     * @param bool $debug
-     */
-    protected function runProcess($debug)
+    protected function runProcess()
     {
         if ($this->maxProcessNumber > count($this->processRunning) && !empty($this->processStack)) {
             /** @var ParaunitProcessInterface $process */
@@ -212,7 +220,7 @@ class Runner
             $process->start();
             $this->processRunning[md5($process->getCommandLine())] = $process;
 
-            if ($debug) {
+            if ($this->debug) {
                 DebugPrinter::printDebugOutput($process, $this->processRunning);
             }
         }

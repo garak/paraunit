@@ -17,7 +17,7 @@ services:
             - %paraunit.max_retry_count%
 
     paraunit.runner.runner:
-        class: Paraunit\Runner\Runner
+        class: Paraunit\Runner\ParallelRunner
         scope: prototype
         arguments:
             - @paraunit.runner.retry_manager

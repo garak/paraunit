@@ -26,7 +26,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $outputInterface = new ConsoleOutputStub();
 
         /** @var ParallelRunner $runner */
-        $runner = $this->container->get('paraunit.runner.runner');
+        $runner = $this->container->get('paraunit.runner.parallel_runner');
 
         $fileArray = array(
             'src/Paraunit/Tests/Stub/EntityManagerClosedTestStub.php',
@@ -47,7 +47,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $outputInterface = new ConsoleOutputStub();
 
-        $runner = $this->container->get('paraunit.runner.runner');
+        $runner = $this->container->get('paraunit.runner.parallel_runner');
 
         $fileArray = array(
             'src/Paraunit/Tests/Stub/DeadLockTestStub.php',
@@ -72,7 +72,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
         $outputInterface = new ConsoleOutputStub();
 
-        $runner = $this->container->get('paraunit.runner.runner');
+        $runner = $this->container->get('paraunit.runner.parallel_runner');
 
         $fileArray = array(
             'src/Paraunit/Tests/Stub/SegFaultTestStub.php',

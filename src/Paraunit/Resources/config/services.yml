@@ -16,8 +16,11 @@ services:
         arguments:
             - %paraunit.max_retry_count%
 
-    paraunit.runner.parallel_runner:
+    ## RUNNERS ##
+
+    paraunit.runner.abstract_runner:
         class: Paraunit\Runner\ParallelRunner
+        abstract: true
         scope: prototype
         arguments:
             - @paraunit.runner.retry_manager
@@ -27,8 +30,15 @@ services:
             - %paraunit.default_max_process%
             - @event_dispatcher
 
+    paraunit.runner.parallel_runner:
+        class: Paraunit\Runner\ParallelRunner
+        parent: paraunit.runner.abstract_runner
+
     paraunit.runner.coverage_runner:
         class: Paraunit\Runner\CoverageRunner
+        parent: paraunit.runner.abstract_runner
+
+    ## PRINTERS ##
 
     paraunit.printer.shark_printer:
         class: Paraunit\Printer\SharkPrinter
@@ -77,7 +87,7 @@ services:
         arguments:
           - @service_container
 
-    ##LISTENERS
+    ## LISTENERS ##
 
     paraunit.printer.console_formatter:
         class: Paraunit\Printer\ConsoleFormatter

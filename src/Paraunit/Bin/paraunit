@@ -15,20 +15,25 @@ if (!ini_get('date.timezone') && !date_default_timezone_get()) {
 }
 
 use Paraunit\Command\ParallelCommand;
+use Paraunit\Command\CoverageCommand;
 use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../../../Container.php';
 
 /** @var \Paraunit\Filter\Filter $filter */
 $filter = $container->get('paraunit.filter.filter');
-/** @var \Paraunit\Runner\ParallelRunner $runner */
-$runner = $container->get('paraunit.runner.parallel_runner');
+/** @var \Paraunit\Runner\ParallelRunner $parallelRunner */
+$parallelRunner = $container->get('paraunit.runner.parallel_runner');
+/** @var \Paraunit\Runner\CoverageRunner $coverageRunner */
+$coverageRunner = $container->get('paraunit.runner.coverage_runner');
 
-$command = new ParallelCommand($filter, $runner);
+$parallelCommand = new ParallelCommand($filter, $parallelRunner);
+$coverageCommand = new CoverageCommand($filter, $coverageRunner);
 
 // HOTFIX -- needed to fool the Symfony's WebTestCase
 $_SERVER['argv'][0] = 'phpunit';
 
 $application = new Application('Paraunit', '0.4');
-$application->add($command);
+$application->add($parallelCommand);
+$application->add($coverageCommand);
 $application->run();

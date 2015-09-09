@@ -4,11 +4,12 @@ namespace Paraunit\Tests\Functional;
 
 use Paraunit\Runner\ParallelRunner;
 use Paraunit\Tests\Stub\ConsoleOutputStub;
+use Symfony\Component\Console\Input\ArrayInput;
 
 /**
- * Class RunnerTest.
+ * Class ParallelRunnerTest.
  */
-class RunnerTest extends \PHPUnit_Framework_TestCase
+class ParallelRunnerTest extends \PHPUnit_Framework_TestCase
 {
     protected $container = null;
 
@@ -23,6 +24,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
     public function testMaxRetryEntityManagerIsClosed()
     {
+        $input = $this->getMockedInput();
         $outputInterface = new ConsoleOutputStub();
 
         /** @var ParallelRunner $runner */
@@ -32,7 +34,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
             'src/Paraunit/Tests/Stub/EntityManagerClosedTestStub.php',
         );
 
-        $this->assertNotEquals(0, $runner->run($fileArray, $outputInterface, 'phpunit.xml.dist'));
+        $this->assertNotEquals(0, $runner->run($fileArray, $input->reveal(), $outputInterface));
 
         $retryCount = array();
         preg_match_all("/<ok>A<\/ok>/", $outputInterface->getOutput(), $retryCount);
@@ -45,6 +47,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
     public function testMaxRetryDeadlock()
     {
+        $input = $this->getMockedInput();
         $outputInterface = new ConsoleOutputStub();
 
         $runner = $this->container->get('paraunit.runner.parallel_runner');
@@ -53,7 +56,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
             'src/Paraunit/Tests/Stub/DeadLockTestStub.php',
         );
 
-        $this->assertNotEquals(0, $runner->run($fileArray, $outputInterface, 'phpunit.xml.dist'));
+        $this->assertNotEquals(0, $runner->run($fileArray, $input->reveal(), $outputInterface));
 
         $retryCount = array();
         preg_match_all("/<ok>A<\/ok>/", $outputInterface->getOutput(), $retryCount);
@@ -71,6 +74,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         }
 
         $outputInterface = new ConsoleOutputStub();
+        $input = $this->getMockedInput();
 
         $runner = $this->container->get('paraunit.runner.parallel_runner');
 
@@ -78,10 +82,19 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
             'src/Paraunit/Tests/Stub/SegFaultTestStub.php',
         );
 
-        $this->assertNotEquals(0, $runner->run($fileArray, $outputInterface, 'phpunit.xml.dist'), 'Exit code should not be 0');
+        $this->assertNotEquals(0, $runner->run($fileArray, $input->reveal(), $outputInterface), 'Exit code should not be 0');
 
         $this->assertContains('<error>X</error>', $outputInterface->getOutput(), 'Missing X output');
         $this->assertContains('1 files with SEGMENTATION FAULTS:', $outputInterface->getOutput(), 'Missing recap title');
         $this->assertContains('<error>SegFaultTestStub.php</error>', $outputInterface->getOutput(), 'Missing failing filename');
+    }
+
+    private function getMockedInput()
+    {
+        $input = $this->prophesize('Symfony\Component\Console\Input\InputInterface');
+        $input->getOption('configuration')->willReturn('phpunit.xml.dist');
+        $input->getOption('debug')->willReturn(false);
+
+        return $input;
     }
 }

@@ -200,11 +200,9 @@ class ParallelRunner extends AbstractRunner implements RunnerInterface
      */
     protected function createProcess($fileName)
     {
-        $configurationFile = getcwd().'/'.$this->phpunitConfigFile;
-
         $command =
             $this->phpunitBin .
-            ' -c '.$configurationFile . ' ' .
+            ' -c '.$this->phpunitConfigFile . ' ' .
             ' --colors=never ' .
             $fileName .
             ' 2>&1';

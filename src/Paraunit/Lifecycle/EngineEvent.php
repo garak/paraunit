@@ -12,36 +12,30 @@ use Symfony\Component\EventDispatcher\Event;
 class EngineEvent extends Event
 {
     // This Event will be triggered before the whole paraunit engine is started
+    // Used to inject console styling and print shark logo
     const BEFORE_START = 'engine_event.before_start';
 
-    /** @var  array */
-    protected $files;
+    // This Event will be triggered before the whole paraunit engine is shut down
+    // Used to collect and merge coverage results
+    const BEFORE_SHUTDOWN = 'engine_event.before_shutdown';
 
     /** @var  OutputInterface */
     protected $outputInterface;
 
     /**
      * EngineEvent constructor.
-     * @param $files
      * @param OutputInterface $outputInterface
      */
-    public function __construct($files, OutputInterface $outputInterface)
+    public function __construct(OutputInterface $outputInterface)
     {
-        $this->files = $files;
         $this->outputInterface = $outputInterface;
-    }
-
-    public static function buildFromContext($files, OutputInterface $outputInteface){
-
-        return new EngineEvent($files, $outputInteface);
-
     }
 
     /**
      * @return OutputInterface
      */
-    public function getOutputInterface(){
+    public function getOutputInterface()
+    {
         return $this->outputInterface;
     }
-
 }

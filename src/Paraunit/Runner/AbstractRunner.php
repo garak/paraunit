@@ -115,9 +115,7 @@ abstract class AbstractRunner
     public function run(array $files, InputInterface $input, OutputInterface $output)
     {
         $this->handleOptions($input);
-
-        $this->eventDispatcher
-            ->dispatch(EngineEvent::BEFORE_START, EngineEvent::buildFromContext($files, $output));
+        $this->engineStart($output);
 
         $start = new \Datetime('now');
         $this->createProcessStackFromFiles($files);
@@ -142,8 +140,25 @@ abstract class AbstractRunner
         $end = new \Datetime('now');
 
         $this->finalPrinter->printFinalResults($output, $this->processCompleted, $start->diff($end));
+        $this->engineShutdown($output);
 
         return $this->getReturnCode();
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function engineStart(OutputInterface $output)
+    {
+        $this->eventDispatcher->dispatch(EngineEvent::BEFORE_START, new EngineEvent($output));
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function engineShutdown(OutputInterface $output)
+    {
+        $this->eventDispatcher->dispatch(EngineEvent::BEFORE_SHUTDOWN, new EngineEvent($output));
     }
 
     protected function runProcess()

@@ -92,6 +92,12 @@ services:
         tags:
           - { name: paraunit.event_listener, event: engine_event.before_start, method: onEngineStart }
 
+    paraunit.coverage.coverage_listener:
+        class: Paraunit\Coverage\CoverageListener
+        tags:
+          - { name: paraunit.event_listener, event: coverage.start, method: onCoverageStart }
+          - { name: paraunit.event_listener, event: coverage.end, method: onCoverageEnd }
+
     ## EXTERNAL DEPs -- proxies ##
 
     paraunit.proxy.phpunit_util_xml_proxy:

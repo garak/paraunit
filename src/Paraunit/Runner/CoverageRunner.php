@@ -3,6 +3,7 @@
 namespace Paraunit\Runner;
 
 
+use Paraunit\Lifecycle\CoverageEvent;
 use Paraunit\Process\ParaunitProcessInterface;
 use Paraunit\Process\SymfonyProcessWrapper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,7 +30,7 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
         $command =
             $this->phpunitBin .
             ' -c '.$this->phpunitConfigFile . ' ' .
-            ' --coverage-php=' . $this->generateFilename() .
+            ' --coverage-php=' . $this->generateCoverageFilename() .
             $fileName .
             ' 2>&1';
 
@@ -37,9 +38,27 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
     }
 
     /**
+     * @param OutputInterface $output
+     */
+    protected function engineStart(OutputInterface $output)
+    {
+        parent::engineStart($output);
+        $this->eventDispatcher->dispatch(CoverageEvent::COVERAGE_START, new CoverageEvent());
+    }
+
+    /**
+     * @param OutputInterface $output
+     */
+    protected function engineShutdown(OutputInterface $output)
+    {
+        parent::engineShutdown($output);
+        $this->eventDispatcher->dispatch(CoverageEvent::COVERAGE_END, new CoverageEvent());
+    }
+
+    /**
      * @return string
      */
-    private function generateFilename()
+    private function generateCoverageFilename()
     {
         // TODO -- filename per i file php di coverage da generare
     }

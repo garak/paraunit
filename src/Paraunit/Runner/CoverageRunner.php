@@ -32,7 +32,7 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
         $this->extractCoverageFiles($input);
         $this->extractDebugOption($input);
 
-        $this->tempDir = sys_get_temp_dir() . '/paraunit/';
+        $this->tempDir = sys_get_temp_dir() . '/paraunit-coverage/';
     }
 
     /**
@@ -66,8 +66,14 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
      */
     protected function engineShutdown(OutputInterface $output)
     {
+        $event = new CoverageEvent(
+            $this->coverageCloverFile,
+            $this->coverageXmlFile,
+            $this->coverageHtmlFile
+        );
+        $this->eventDispatcher->dispatch(CoverageEvent::COVERAGE_END, $event);
+
         parent::engineShutdown($output);
-        $this->eventDispatcher->dispatch(CoverageEvent::COVERAGE_END, new CoverageEvent());
     }
 
     /**
@@ -75,9 +81,9 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
      */
     protected function extractCoverageFiles(InputInterface $input)
     {
-        $this->coverageCloverFile = $this->extractFileRealPathFromInput($input, 'output-clover');
-        $this->coverageXmlFileFile = $this->extractFileRealPathFromInput($input, 'output-xml');
-        $this->coverageHtmlFile = $this->extractFileRealPathFromInput($input, 'output-html');
+        $this->coverageCloverFile = $this->extractFileRealPathFromInput($input, 'coverage-clover');
+        $this->coverageXmlFile = $this->extractDirRealPathFromInput($input, 'coverage-xml');
+        $this->coverageHtmlFile = $this->extractDirRealPathFromInput($input, 'coverage-html');
     }
 
     /**
@@ -86,6 +92,6 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
      */
     private function generateCoverageFilename($fileName)
     {
-        return tempnam($this->tempDir, pathinfo($fileName, PATHINFO_FILENAME));
+        return tempnam($this->tempDir, pathinfo($fileName, PATHINFO_FILENAME) . '_');
     }
 }

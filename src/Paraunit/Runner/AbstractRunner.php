@@ -206,13 +206,42 @@ abstract class AbstractRunner
      */
     protected function extractFileRealPathFromInput(InputInterface $input, $parameterName)
     {
-        $configParam = $input->getOption($parameterName);
-        $configurationFile = getcwd().'/'.$configParam;
-        if (!file_exists($configurationFile)) {
-            throw new \InvalidArgumentException("The $parameterName parameter is  NOT valid, file not found");
+        $parameter = $input->getOption($parameterName);
+
+        if (is_null($parameter)) {
+            return null;
         }
 
-        return realpath($configurationFile);
+        $filePath = getcwd() . DIRECTORY_SEPARATOR . $parameter;
+        if (!file_exists($filePath)) {
+            throw new \InvalidArgumentException("The $parameterName parameter is  NOT valid, file not found -- ".$filePath);
+        }
+
+        return realpath($filePath);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param $parameterName
+     * @return string
+     * @throws \Exception | \InvalidArgumentException
+     */
+    protected function extractDirRealPathFromInput(InputInterface $input, $parameterName)
+    {
+        $parameter = $input->getOption($parameterName);
+
+        if (is_null($parameter)) {
+            return null;
+        }
+
+        $directory = getcwd() . DIRECTORY_SEPARATOR . $parameter;
+
+        if (file_exists($directory) && !is_dir($directory)) {
+            throw new \InvalidArgumentException("The $parameterName parameter is NOT valid, it's not a directory");
+        }
+
+        // no realpath, it may not exist yet!
+        return $directory;
     }
 
     protected function extractDebugOption(InputInterface $input)

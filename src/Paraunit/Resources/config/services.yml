@@ -21,7 +21,6 @@ services:
     paraunit.runner.abstract_runner:
         class: Paraunit\Runner\ParallelRunner
         abstract: true
-        scope: prototype
         arguments:
             - @paraunit.runner.retry_manager
             - @paraunit.parser.process_output_parser
@@ -50,7 +49,6 @@ services:
 
     paraunit.printer.final_printer:
         class: Paraunit\Printer\FinalPrinter
-        scope: prototype
 
     ## OUTPUT PARSERS ##
 

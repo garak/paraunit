@@ -196,13 +196,23 @@ abstract class AbstractRunner
      */
     protected function extractPhpunitConfigFile(InputInterface $input)
     {
-        $configParam = $input->getOption('configuration');
+        $this->phpunitConfigFile = $this->extractFileRealPathFromInput($input, 'configuration');
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param $parameterName
+     * @return string
+     */
+    protected function extractFileRealPathFromInput(InputInterface $input, $parameterName)
+    {
+        $configParam = $input->getOption($parameterName);
         $configurationFile = getcwd().'/'.$configParam;
         if (!file_exists($configurationFile)) {
-            throw new \InvalidArgumentException('The configuration parameter is invalid, file not found');
+            throw new \InvalidArgumentException("The $parameterName parameter is  NOT valid, file not found");
         }
 
-        $this->phpunitConfigFile = realpath($configurationFile);
+        return realpath($configurationFile);
     }
 
     protected function extractDebugOption(InputInterface $input)

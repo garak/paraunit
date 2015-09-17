@@ -38,9 +38,8 @@ class CoverageCommand extends Command
         $this
             ->setName('coverage')
             ->addOption('output-clover', 'clover', InputOption::VALUE_REQUIRED, 'Output file for Clover XML coverage result')
-            ->addOption('output-xml', 'html', InputOption::VALUE_REQUIRED, 'Output file for PHPUnit XML coverage result')
+            ->addOption('output-xml', 'xml', InputOption::VALUE_REQUIRED, 'Output file for PHPUnit XML coverage result')
             ->addOption('output-html', 'html', InputOption::VALUE_REQUIRED, 'Output file for HTML coverage result')
-            ->addOption('configuration', null, InputOption::VALUE_REQUIRED, 'The PHPUnit XML config file', 'phpunit.xml.dist')
             ->addOption('configuration', null, InputOption::VALUE_REQUIRED, 'The PHPUnit XML config file', 'phpunit.xml.dist')
             ->addOption('testsuite', null, InputOption::VALUE_REQUIRED, 'Choice a specific testsuite from your XML config file')
             ->addOption('debug', null, InputOption::VALUE_NONE, 'Print verbose debug output');

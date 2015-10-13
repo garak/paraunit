@@ -32,7 +32,7 @@ class CoverageRunner extends AbstractRunner implements RunnerInterface
         $this->extractCoverageFiles($input);
         $this->extractDebugOption($input);
 
-        $this->tempDir = sys_get_temp_dir() . '/paraunit-coverage/';
+        $this->tempDir = '/dev/shm/paraunit-coverage/';
     }
 
     /**

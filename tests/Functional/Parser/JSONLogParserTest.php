@@ -3,7 +3,7 @@
 namespace Tests\Functional\Parser;
 
 
-use Paraunit\Configuration\TempFileNameFactory;
+use Paraunit\Configuration\TempFilenameFactory;
 use Paraunit\Lifecycle\ProcessEvent;
 use Paraunit\Parser\JSONLogParser;
 use Paraunit\TestResult\Interfaces\PrintableTestResultInterface;

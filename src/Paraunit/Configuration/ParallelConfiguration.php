@@ -13,19 +13,29 @@ use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
  * Class Paraunit
  * @package Paraunit\Configuration
  */
-class Paraunit
+class ParallelConfiguration
 {
-    const PARAUNIT_VERSION = '0.5.1';
-
     /**
      * @return ContainerBuilder
      */
-    public static function buildContainer()
+    public function buildContainer()
     {
         $containerBuilder = new ContainerBuilder();
 
+        $this->loadYamlConfiguration($containerBuilder);
+        $this->registerEventDispatcher($containerBuilder);
+        $containerBuilder->compile();
+
+        return $containerBuilder;
+    }
+
+    /**
+     * @param ContainerBuilder $containerBuilder
+     * @return YamlFileLoader
+     */
+    protected function loadYamlConfiguration(ContainerBuilder $containerBuilder)
+    {
         $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../Resources/config/'));
-        $loader->load('commands.yml');
         $loader->load('configuration.yml');
         $loader->load('file.yml');
         $loader->load('parser.yml');
@@ -36,6 +46,14 @@ class Paraunit
         $loader->load('test_result_container.yml');
         $loader->load('test_result_format.yml');
 
+        return $loader;
+    }
+
+    /**
+     * @param ContainerBuilder $containerBuilder
+     */
+    private function registerEventDispatcher(ContainerBuilder $containerBuilder)
+    {
         $containerBuilder->addCompilerPass(new RegisterListenersPass());
 
         $containerBuilder->setDefinition(
@@ -45,9 +63,5 @@ class Paraunit
                 array(new Reference('service_container'))
             )
         );
-
-        $containerBuilder->compile();
-
-        return $containerBuilder;
     }
 }

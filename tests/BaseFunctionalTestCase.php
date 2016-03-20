@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Paraunit\Configuration\TempFilenameFactory;
-use Paraunit\Configuration\Paraunit;
+use Paraunit\Configuration\ParallelConfiguration;
 use Paraunit\File\Cleaner;
 use Paraunit\File\TempDirectory;
 use Tests\Stub\StubbedParaunitProcess;
@@ -22,7 +22,8 @@ abstract class BaseFunctionalTestCase extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->container = Paraunit::buildContainer();
+        $this->loadContainer();
+
         $this->cleanUpTempDirForThisExecution();
     }
 
@@ -34,6 +35,8 @@ abstract class BaseFunctionalTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param StubbedParaunitProcess $process
+     * @param string $stubLog
      * @return StubbedParaunitProcess
      */
     public function createLogForProcessFromStubbedLog(StubbedParaunitProcess $process, $stubLog)
@@ -48,12 +51,19 @@ abstract class BaseFunctionalTestCase extends \PHPUnit_Framework_TestCase
         copy($stubLogFilename, $filename);
     }
 
-    private function cleanUpTempDirForThisExecution()
+    protected function cleanUpTempDirForThisExecution()
     {
         if ($this->container) {
             /** @var TempDirectory $tempDirectory */
             $tempDirectory = $this->container->get('paraunit.file.temp_directory');
             Cleaner::cleanUpDir($tempDirectory->getTempDirForThisExecution());
         }
+    }
+
+    protected function loadContainer()
+    {
+        $configuration = new ParallelConfiguration();
+
+        $this->container = $configuration->buildContainer();
     }
 }

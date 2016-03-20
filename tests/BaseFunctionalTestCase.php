@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * Class BaseFunctionalTestCase
  * @package Paraunit\Tests
  */
-abstract class BaseFunctionalTestCase extends \PHPUnit_Framework_TestCase
+abstract class BaseFunctionalTestCase extends BaseTestCase
 {
     /** @var ContainerBuilder */
     protected $container = null;
